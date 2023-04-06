@@ -25,7 +25,7 @@ $(BINDIR) :
 	mkdir $(BINDIR)
 
 clean : 
-	$(RM) -d $(BINDIR)
+	$(RM) -r $(BINDIR)
 	$(MAKE) -C $(LIBFT) fclean
 
 fclean : clean

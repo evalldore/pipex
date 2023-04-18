@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:18 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/06 09:34:22 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/04/17 19:24:43 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,5 +16,6 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/wait.h>
+# include "libft.h"
 
 #endif

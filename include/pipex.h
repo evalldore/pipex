@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: niceguy <niceguy@student.42.fr>            +#+  +:+       +#+        */
+/*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:18 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/21 02:28:59 by niceguy          ###   ########.fr       */
+/*   Updated: 2023/04/21 19:23:29 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <unistd.h>
 # include <sys/wait.h>
 # include "libft.h"
+# define ERR_CMD "Command doesnt exist!"
 
 typedef struct pipex
 {
@@ -26,5 +27,7 @@ typedef struct pipex
 	char	**paths;
 	char	**cmds[2];
 }	t_pipex;
+
+void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env);
 
 #endif

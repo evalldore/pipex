@@ -2,3 +2,7 @@
 .DS_Store
 bin/
 *.a
+pipexMedic/
+pipex
+in
+out

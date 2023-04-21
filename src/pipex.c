@@ -3,89 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: niceguy <niceguy@student.42.fr>            +#+  +:+       +#+        */
+/*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/21 06:10:38 by niceguy          ###   ########.fr       */
+/*   Updated: 2023/04/21 18:48:52 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-/*
-	int	fd[2];
-	int	pid[2];
-
-	(void)argc;
-	(void)argv;
-	if (pipe(fd) == -1)
-		return (EXIT_FAILURE);
-	pid[0] = fork();
-	if (pid[0] < 0)
-		return (2);
-	if (pid[0] == 0)
-	{
-		dup2(fd[1], STDOUT_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		execlp("ping", "ping", "-c", "5", "google.com", NULL);
-	}
-	pid[1] = fork();
-	if (pid[1] < 0)
-		return (3);
-	if (pid[1] == 0)
-	{
-		dup2(fd[0], STDIN_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		execlp("grep", "grep", "rtt", NULL);
-	}
-	close(fd[0]);
-	close(fd[1]);
-	waitpid(pid[0], NULL, 0);
-	waitpid(pid[1], NULL, 0);
-*/
-
-/*void	pipex(const char *in, char **cmd1, char **cmd2, const char *out)
-{
-	
-}*/
-
-static void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
-{
-	char	**cmd;
-	char	**arr;
-	char	**paths;
-	char	*cmd_path;
-
-	cmd = ft_split(arg, ' ');
-	dup2(pipex->fd[std], std);
-	close(pipex->fd[1 - std]);
-	dup2(pipex->files[1 - std], 1 - std);
-	paths = pipex->paths;
-	while (*paths)
-	{
-		cmd_path = ft_strjoin(*paths++, cmd[0]);
-		if (execve(cmd_path, cmd, env) == 0)
-		{
-			free(cmd_path);
-			break;
-		}
-		free(cmd_path);
-	}
-	arr = cmd;
-	while (*arr)
-		free(*arr++);
-	free(cmd);
-}
-
-static int	open_inout(t_pipex *pipex, char	*in, char *out)
+static int	open_pipe(t_pipex *pipex, char	*in, char *out)
 {
 	pipex->files[0] = open(in, O_CREAT | O_RDONLY);
 	if (pipex->files[0] < 0)
 		return (EXIT_FAILURE);
 	pipex->files[1] = open(out, O_TRUNC | O_CREAT | O_RDWR, 0000644);
 	if (pipex->files[1] < 0)
+		return (EXIT_FAILURE);
+	if (pipe(pipex->fd) < 0)
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
@@ -137,9 +72,7 @@ int	main(int argc, char	**argv, char **env)
 
 	if (argc != 5)
 		return (EXIT_FAILURE);
-	if (open_inout(&pipex, argv[1], argv[argc - 1]) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
-	if (pipe(pipex.fd) < 0)
+	if (open_pipe(&pipex, argv[1], argv[argc - 1]) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	pipex.paths = env_paths(env);
 	pipex.pid[0] = fork();

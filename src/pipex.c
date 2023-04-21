@@ -6,7 +6,7 @@
 /*   By: niceguy <niceguy@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/21 04:28:39 by niceguy          ###   ########.fr       */
+/*   Updated: 2023/04/21 06:05:31 by niceguy          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@
 	
 }*/
 
-void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
+static void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
 {
 	char	**cmd;
 	char	**arr;
@@ -79,7 +79,7 @@ void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
 	free(cmd);
 }
 
-int	open_inout(t_pipex *pipex, char	*in, char *out)
+static int	open_inout(t_pipex *pipex, char	*in, char *out)
 {
 	pipex->files[0] = open(in, O_RDONLY);
 	if (pipex->files[0] < 0)
@@ -90,7 +90,7 @@ int	open_inout(t_pipex *pipex, char	*in, char *out)
 	return (EXIT_SUCCESS);
 }
 
-void	close_pipe(t_pipex *pipex)
+static void	close_pipe(t_pipex *pipex)
 {
 	char	**paths;
 
@@ -101,6 +101,8 @@ void	close_pipe(t_pipex *pipex)
 	paths = pipex->paths;
 	while (*paths)
 		free(*paths++);
+	free(pipex->paths);
+	pipex->paths = NULL;
 }
 
 static char	**env_paths(char	**env)

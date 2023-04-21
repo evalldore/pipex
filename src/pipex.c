@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: niceguy <niceguy@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/21 00:15:50 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/04/21 04:28:39 by niceguy          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,16 +51,28 @@
 	
 }*/
 
-void	exec_cmd(t_pipex *pipex, int std, char *arg)
+void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
 {
 	char	**cmd;
 	char	**arr;
+	char	**paths;
+	char	*cmd_path;
 
 	cmd = ft_split(arg, ' ');
 	dup2(pipex->fd[std], std);
 	close(pipex->fd[1 - std]);
-	dup2(pipex->paths[1 - std], 1 - std);
-	execve(cmd[0], &cmd[1], NULL);
+	dup2(pipex->files[1 - std], 1 - std);
+	paths = pipex->paths;
+	while (*paths)
+	{
+		cmd_path = ft_strjoin(*paths++, cmd[0]);
+		if (execve(cmd_path, cmd, env) == 0)
+		{
+			free(cmd_path);
+			break;
+		}
+		free(cmd_path);
+	}
 	arr = cmd;
 	while (*arr)
 		free(*arr++);
@@ -69,44 +81,75 @@ void	exec_cmd(t_pipex *pipex, int std, char *arg)
 
 int	open_inout(t_pipex *pipex, char	*in, char *out)
 {
-	pipex->paths[0] = open(in, O_RDONLY);
-	if (pipex->paths[0] < 0)
+	pipex->files[0] = open(in, O_RDONLY);
+	if (pipex->files[0] < 0)
 		return (EXIT_FAILURE);
-	pipex->paths[1] = open(out, O_TRUNC | O_CREAT | O_RDWR, 0000644);
-	if (pipex->paths[1] < 0)
+	pipex->files[1] = open(out, O_TRUNC | O_CREAT | O_RDWR, 0000644);
+	if (pipex->files[1] < 0)
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
 void	close_pipe(t_pipex *pipex)
 {
+	char	**paths;
+
 	close(pipex->fd[0]);
 	close(pipex->fd[1]);
 	waitpid(pipex->pid[0], NULL, 0);
 	waitpid(pipex->pid[1], NULL, 0);
+	paths = pipex->paths;
+	while (*paths)
+		free(*paths++);
+}
+
+static char	**env_paths(char	**env)
+{
+	char	**arr;
+	char	*temp;
+	size_t	index;
+
+	while (*env)
+	{
+		if (ft_strnstr(*env, "PATH", ft_strlen(*env)))
+		{
+			arr = ft_split(*env + 5, ':');
+			index = 0;
+			while (arr[index])
+			{
+				temp = arr[index];
+				arr[index] = ft_strjoin(temp, "/");
+				free(temp);
+				index++;
+			}
+			return (arr);
+		}
+		env++;
+	}
+	return (NULL);
 }
 
 int	main(int argc, char	**argv, char **env)
 {
 	t_pipex	pipex;
 
-	(void)env;
 	if (argc != 5)
 		return (EXIT_FAILURE);
 	if (open_inout(&pipex, argv[1], argv[argc - 1]) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	if (pipe(pipex.fd) == -1)
+	if (pipe(pipex.fd) < 0)
 		return (EXIT_FAILURE);
+	pipex.paths = env_paths(env);
 	pipex.pid[0] = fork();
 	if (pipex.pid[0] < 0)
 		return (2);
 	if (pipex.pid[0] == 0)
-		exec_cmd(&pipex, 1, argv[2]);
+		exec_cmd(&pipex, 1, argv[2], env);
 	pipex.pid[1] = fork();
 	if (pipex.pid[1] < 0)
 		return (3);
 	if (pipex.pid[1] == 0)
-		exec_cmd(&pipex, 0, argv[3]);
+		exec_cmd(&pipex, 0, argv[3], env);
 	close_pipe(&pipex);
 	return (EXIT_SUCCESS);
 }

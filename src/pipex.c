@@ -6,7 +6,7 @@
 /*   By: niceguy <niceguy@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/21 06:05:31 by niceguy          ###   ########.fr       */
+/*   Updated: 2023/04/21 06:10:38 by niceguy          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ static void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
 
 static int	open_inout(t_pipex *pipex, char	*in, char *out)
 {
-	pipex->files[0] = open(in, O_RDONLY);
+	pipex->files[0] = open(in, O_CREAT | O_RDONLY);
 	if (pipex->files[0] < 0)
 		return (EXIT_FAILURE);
 	pipex->files[1] = open(out, O_TRUNC | O_CREAT | O_RDWR, 0000644);

@@ -27,6 +27,8 @@ $(BINDIR) :
 clean : 
 	$(RM) -r $(BINDIR)
 	$(MAKE) -C $(LIBFT) fclean
+	$(RM) in
+	$(RM) out
 
 fclean : clean
 	$(RM) $(NAME)

@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:18 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/24 18:03:17 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/04/25 17:23:39 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/wait.h>
+# include <errno.h>
 # include "libft.h"
 # define ERR_CMD "Command doesnt exist!"
 
@@ -28,6 +29,6 @@ typedef struct pipex
 	char	**cmds[2];
 }	t_pipex;
 
-int	exec_cmd(t_pipex *pipex, int std, char *arg, char **env);
+void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env);
 
 #endif

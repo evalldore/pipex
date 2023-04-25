@@ -6,25 +6,27 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/24 19:49:22 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/04/25 19:26:15 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static void	close_pipe(t_pipex *pipex)
+static int	close_pipe(t_pipex *pipex)
 {
 	char	**paths;
+	int		status;
 
 	close(pipex->fd[0]);
 	close(pipex->fd[1]);
-	waitpid(pipex->pid[0], NULL, 0);
-	waitpid(pipex->pid[1], NULL, 0);
+	waitpid(pipex->pid[0], &status, 0);
+	waitpid(pipex->pid[1], &status, 0);
 	paths = pipex->paths;
 	while (*paths)
 		free(*paths++);
 	free(pipex->paths);
 	pipex->paths = NULL;
+	return (status);
 }
 
 static char	**env_paths(char	**env)
@@ -56,8 +58,6 @@ static char	**env_paths(char	**env)
 static int	open_pipe(t_pipex *pipex, char	*in, char *out, char **env)
 {
 	pipex->files[0] = open(in, O_RDONLY);
-	if (pipex->files[0] < 0)
-		return (EXIT_FAILURE);
 	pipex->files[1] = open(out, O_TRUNC | O_CREAT | O_RDWR, 0644);
 	if (pipex->files[1] < 0)
 		return (EXIT_FAILURE);
@@ -79,14 +79,13 @@ int	main(int argc, char	**argv, char **env)
 		return (EXIT_FAILURE);
 	pipex.pid[0] = fork();
 	if (pipex.pid[0] < 0)
-		return (2);
+		return (EXIT_FAILURE);
 	if (pipex.pid[0] == 0)
 		exec_cmd(&pipex, 1, argv[2], env);
 	pipex.pid[1] = fork();
 	if (pipex.pid[1] < 0)
-		return (3);
+		return (EXIT_FAILURE);
 	if (pipex.pid[1] == 0)
 		exec_cmd(&pipex, 0, argv[3], env);
-	close_pipe(&pipex);
-	return (EXIT_SUCCESS);
+	return (close_pipe(&pipex));
 }

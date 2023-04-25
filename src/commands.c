@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/21 18:13:37 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/21 19:44:22 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/04/24 19:30:07 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,29 +23,41 @@ static char	*get_cmd(char **paths, char *cmd)
 			return (cmd_path);
 		free(cmd_path);
 	}
-	perror("get_cmd\n\t");
 	return (NULL);
 }
 
-void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
+static void	free_cmds(char	**cmds)
+{
+	char	**arr;
+
+	arr = cmds;
+	while (*arr)
+		free(*arr++);
+	free(cmds);
+}
+
+int	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
 {
 	char	**cmd;
-	char	**arr;
 	char	*cmd_path;
+	int		status;
 
 	cmd = ft_split(arg, ' ');
 	dup2(pipex->fd[std], std);
 	close(pipex->fd[1 - std]);
 	dup2(pipex->files[1 - std], 1 - std);
+	status = -1;
 	cmd_path = get_cmd(pipex->paths, cmd[0]);
 	if (cmd_path)
 	{
-		if (execve(cmd_path, cmd, env) == -1)
-			perror("exec_cmd\n\t");
+		status = execve(cmd_path, cmd, env);
 		free(cmd_path);
 	}
-	arr = cmd;
-	while (*arr)
-		free(*arr++);
-	free(cmd);
+	free_cmds(cmd);
+	if (status == -1)
+	{
+		perror("pipex");
+		exit(EXIT_FAILURE);
+	}
+	return (status);
 }

@@ -3,27 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: niceguy <niceguy@student.42.fr>            +#+  +:+       +#+        */
+/*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/22 04:25:24 by niceguy          ###   ########.fr       */
+/*   Updated: 2023/04/24 19:49:22 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-static int	open_pipe(t_pipex *pipex, char	*in, char *out)
-{
-	pipex->files[0] = open(in, O_RDONLY);
-	if (pipex->files[0] < 0)
-		return (EXIT_FAILURE);
-	pipex->files[1] = open(out, O_TRUNC | O_CREAT | O_RDWR, 0666);
-	if (pipex->files[1] < 0)
-		return (EXIT_FAILURE);
-	if (pipe(pipex->fd) < 0)
-		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
-}
 
 static void	close_pipe(t_pipex *pipex)
 {
@@ -66,16 +53,29 @@ static char	**env_paths(char	**env)
 	return (NULL);
 }
 
+static int	open_pipe(t_pipex *pipex, char	*in, char *out, char **env)
+{
+	pipex->files[0] = open(in, O_RDONLY);
+	if (pipex->files[0] < 0)
+		return (EXIT_FAILURE);
+	pipex->files[1] = open(out, O_TRUNC | O_CREAT | O_RDWR, 0644);
+	if (pipex->files[1] < 0)
+		return (EXIT_FAILURE);
+	if (pipe(pipex->fd) < 0)
+		return (EXIT_FAILURE);
+	pipex->paths = env_paths(env);
+	if (!pipex->paths)
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
+}
+
 int	main(int argc, char	**argv, char **env)
 {
 	t_pipex	pipex;
 
 	if (argc != 5)
 		return (EXIT_FAILURE);
-	if (open_pipe(&pipex, argv[1], argv[argc - 1]) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
-	pipex.paths = env_paths(env);
-	if (!pipex.paths)
+	if (open_pipe(&pipex, argv[1], argv[argc - 1], env) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	pipex.pid[0] = fork();
 	if (pipex.pid[0] < 0)

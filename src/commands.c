@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/21 18:13:37 by evallee-          #+#    #+#             */
-/*   Updated: 2023/05/08 12:08:41 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/05/08 18:25:43 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,14 @@ static void	free_cmd(char	**cmds)
 	free(cmds);
 }
 
+void	close_fds(t_pipex	*pipex)
+{
+	close(pipex->fd[0]);
+	close(pipex->fd[1]);
+	close(pipex->files[0]);
+	close(pipex->files[1]);
+}
+
 void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
 {
 	char	**cmd;
@@ -44,8 +52,8 @@ void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
 
 	cmd = ft_split(arg, ' ');
 	dup2(pipex->fd[std], std);
-	close(pipex->fd[1 - std]);
 	dup2(pipex->files[1 - std], 1 - std);
+	close_fds(pipex);
 	cmd_path = get_cmd(pipex->paths, cmd[0]);
 	status = EXIT_SUCCESS;
 	if (cmd_path)

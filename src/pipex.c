@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/05/08 12:02:24 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/05/08 18:27:20 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,7 @@ static int	close_pipe(t_pipex *pipex)
 	char	**paths;
 	int		status;
 
-	close(pipex->fd[0]);
-	close(pipex->fd[1]);
+	close_fds(pipex);
 	waitpid(pipex->pid[0], &status, 0);
 	waitpid(pipex->pid[1], &status, 0);
 	paths = pipex->paths;
@@ -73,6 +72,8 @@ static int	open_pipe(t_pipex *pipex, char	*in, char *out, char **env)
 	if (pipex->files[0] < 0)
 		print_error("no such file or directory", in);
 	pipex->files[1] = open(out, O_TRUNC | O_CREAT | O_RDWR, 0644);
+	if (pipex->files[1] < 0)
+		return (EXIT_FAILURE);
 	if (pipe(pipex->fd) < 0)
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);

@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:18 by evallee-          #+#    #+#             */
-/*   Updated: 2023/04/25 17:23:39 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/05/08 14:32:50 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,5 +30,6 @@ typedef struct pipex
 }	t_pipex;
 
 void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env);
+void	close_fds(t_pipex *pipex);
 
 #endif

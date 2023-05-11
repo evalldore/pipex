@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/05/11 14:47:48 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/05/11 14:48:43 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ static bool	open_pipe(t_pipex *pipex, int argc, char **env)
 	pipex->env = env;
 	return (true);
 }
+
 static int	close_pipe(t_pipex *pipex)
 {
 	int		status;

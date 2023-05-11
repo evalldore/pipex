@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 08:52:06 by evallee-          #+#    #+#             */
-/*   Updated: 2023/05/11 14:48:43 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/05/11 14:49:39 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static bool	open_pipe(t_pipex *pipex, int argc, char **env)
 
 	if (argc != 5)
 	{
-		ft_putstr_fd("pipex: Not enough arguments", 2);
+		ft_putstr_fd("pipex: Not enough arguments\n", 2);
 		return (false);
 	}
 	paths = get_env_paths(env);

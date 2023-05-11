@@ -1,5 +1,5 @@
 NAME		= pipex
-SRCS		= pipex.c commands.c
+SRCS		= pipex.c commands.c utils.c
 BINDIR		= bin/
 SRCDIR		= src/
 OBJS		= $(addprefix $(BINDIR), $(SRCS:.c=.o))

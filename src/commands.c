@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/21 18:13:37 by evallee-          #+#    #+#             */
-/*   Updated: 2023/05/08 18:25:43 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/05/11 14:31:46 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,51 +23,37 @@ static char	*get_cmd(char **paths, char *cmd)
 			return (cmd_path);
 		free(cmd_path);
 	}
+	print_error("command not found", cmd);
 	return (NULL);
 }
 
-static void	free_cmd(char	**cmds)
+static void	dup_fds(t_pipex *pipex, int fd, int std)
 {
-	char	**arr;
-
-	arr = cmds;
-	while (*arr)
-		free(*arr++);
-	free(cmds);
+	dup2(pipex->fd[std], std);
+	dup2(fd, 1 - std);
+	close_fds(pipex);
+	close(fd);
 }
 
-void	close_fds(t_pipex	*pipex)
-{
-	close(pipex->fd[0]);
-	close(pipex->fd[1]);
-	close(pipex->files[0]);
-	close(pipex->files[1]);
-}
-
-void	exec_cmd(t_pipex *pipex, int std, char *arg, char **env)
+void	exec_cmd(t_pipex *pipex, int fd, int std, char *arg)
 {
 	char	**cmd;
 	char	*cmd_path;
-	int		status;
 
 	cmd = ft_split(arg, ' ');
-	dup2(pipex->fd[std], std);
-	dup2(pipex->files[1 - std], 1 - std);
-	close_fds(pipex);
+	if (!cmd)
+		return ;
 	cmd_path = get_cmd(pipex->paths, cmd[0]);
-	status = EXIT_SUCCESS;
 	if (cmd_path)
 	{
-		if (execve(cmd_path, cmd, env) == -1)
-			status = EXIT_FAILURE;
+		dup_fds(pipex, fd, std);
+		execve(cmd_path, cmd, pipex->env);
+		perror("pipex");
 		free(cmd_path);
 	}
-	else
-		status = 127;
-	if (status == EXIT_FAILURE)
-		perror("pipex");
-	else if (status == 127)
-		ft_putstr_fd("pipex: command not found\n", 2);
-	free_cmd(cmd);
-	exit(status);
+	close_fds(pipex);
+	close(fd);
+	free_array(cmd);
+	free_array(pipex->paths);
+	exit(127);
 }

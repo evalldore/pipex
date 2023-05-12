@@ -6,7 +6,7 @@
 /*   By: evallee- <evallee-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/21 18:13:37 by evallee-          #+#    #+#             */
-/*   Updated: 2023/05/11 14:31:46 by evallee-         ###   ########.fr       */
+/*   Updated: 2023/05/12 13:34:11 by evallee-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,5 @@ void	exec_cmd(t_pipex *pipex, int fd, int std, char *arg)
 	close(fd);
 	free_array(cmd);
 	free_array(pipex->paths);
-	exit(127);
+	exit(0);
 }
